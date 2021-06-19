@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        // 비디오에 설정 
+  var constraints = { audio: true, video: { width: 1280, height: 720 } };
+
+  // getUserMedia를 통해 권한을 부여받아 비디오 실행
+navigator.mediaDevices.getUserMedia(constraints)
+.then(function(mediaStream) {
+  var video = document.querySelector('video');
+  video.srcObject = mediaStream;
+  video.onloadedmetadata = function(e) {
+    video.play();
+  };
+})
+.catch(function(err) { console.log(err.name + ": " + err.message); }); 
+    </script>
+</head>
+<body>
+    <video id="localVideo" autoplay playsinline controls="false"/>
+
+</body>
+</html>
