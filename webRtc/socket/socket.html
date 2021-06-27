@@ -68,7 +68,7 @@
       background: #efefef;
     }
 
-    #menu{
+    #menu {
       position: fixed;
     }
   </style>
@@ -85,11 +85,11 @@
     </form>
   </div>
   <div>
-    <div id="menu"> 
-    <form id="join">
-     <input id="room" type="text"><button>입장</button>
-     <ul id="list"></ul>
-    </form>
+    <div id="menu">
+      <form id="join">
+        <input id="room" type="text"><button>입장</button>
+        <ul id="list"></ul>
+      </form>
     </div>
   </div>
   <!-- socket io 서버를 설정-->
@@ -101,7 +101,7 @@
     let name = $('#name');
     name.val(prompt('닉네임을 설정해 주세요.'));
     let userName = name.val();
-    
+
     // 안됫던 이유는??
     // let name = document.getElementById('name');
     // console.log('valeu :'+value.value);
@@ -118,38 +118,61 @@
 
     let roomName;
 
+    function notify(msg) {
+      if (Notification.permission !== "denied") {
+        Notification.requestPermission(permission => {
+          if (permission === "granted") {
+            new Notification(`${msg}`);
+          } else {
+            alert('Notification denied');
+          }
+        });
+      }
+    }
+
     join.addEventListener('submit', function (e) {
       e.preventDefault();
       // input value 존재시
-      user.emit('roomleave', {name:userName,room:roomName});
+      user.emit('roomleave', { name: userName, room: roomName });
       roomName = room.value;
-      user.emit('roomjoin', {name:userName,room:roomName});
+      user.emit('roomjoin', { name: userName, room: roomName });
       input.value = '';
     });
-    
+
     // submit시 action이 아닌 행동(preventDefault)취소 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       // input value 존재시
       if (input.value) {
         // user의 메세지를 'chat message'로 서버로 보낸다(?) 
-        user.emit('chat message', {name:userName, msg:input.value, room:roomName});
+        notify(input.value);
+        user.emit('chat message', { name: userName, msg: input.value, room: roomName });
         input.value = '';
       }
     });
 
-    user.on('roomjoin', function(msg){
+    user.on('roomjoin', function (msg) {
       let item = document.createElement('li');
       item.textContent = `${msg.name}님이 ${msg.room}에 입장하셨습니다.`;
       messages.appendChild(item);
       window.scrollTo(0, document.body.scrollHeight);
     })
 
-    user.on('roomleave', function(msg){
+    user.on('roomleave', function (msg) {
       let item = document.createElement('li');
       item.textContent = `${msg.name}님이 퇴장하셨습니다.`;
       messages.appendChild(item);
       window.scrollTo(0, document.body.scrollHeight);
+    })
+
+    user.on('loadlist', data => {
+      $('#list *').remove();
+      for(var i= 0; i < data.length; i++){
+        console.log(data[i]);
+        let item = document.createElement('li');
+        item.textContent = data[i].name;
+        list.appendChild(item);
+      }
     })
 
     user.on('addlist', function (msg) {
@@ -158,7 +181,7 @@
       list.appendChild(item);
     })
 
-    user.on('removelist', function(msg){
+    user.on('removelist', function (msg) {
       $(list).children(`li:contains("${msg.name}")`).remove();
     })
 
