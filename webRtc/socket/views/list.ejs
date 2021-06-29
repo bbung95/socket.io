@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-2.2.4.js"
+        integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
+    <title>socket List</title>
+    <style>
+        #main {
+
+            margin: auto;
+            background: grey;
+            width: 600px;
+            height: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+
+            font-size: 70px;
+            text-align: center;
+            background-color: slategrey;
+        }
+
+
+        .list {
+
+            font-size: 50px;
+            background: floralwhite;
+            list-style: none;
+            text-align: center;
+        }
+
+        .room {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main">
+        <div class="header">socket List</div>
+        <div class="list">
+        </div>
+        <div>
+            <form id="form" action="/create_protocol" method="POST">
+                <input type="text" id="input" name="roomName" autocomplete="off">
+                <button>room create</button>
+            </form>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+       
+        let data = JSON.parse('<%- JSON.stringify(data) %>'); 
+        for(var i in data){
+            $('.list').append(`<div class="room">${data[i].roomName}<input type="hidden" value="${data[i]._id}"></div>`);
+        }
+    </script>
+    <script>
+
+        // let list = document.querySelector('.list');
+        // //let room = document.querySelector('.room');
+        let room = $('.list').children('div');
+        // let form = document.getElementById('form');
+        // let input = document.getElementById('input');
+
+        room.on('click', function(){    
+            let roomId = $(this).children('input').val();     
+            location.href = `/room?roomId=${roomId}`;
+        })
+
+        // form.addEventListener('submit', function (e) {
+        //     e.preventDefault();
+        //     // input value 존재시
+        //     if (input.value) {
+        //         //user.emit('create', input.value);
+        //         //let item = document.createElement('div');
+        //         //  item.className = "room";
+        //         // item.textContent = msg;
+        //         //  list.appendChild(item);
+                
+        //         input.value = '';
+        //     }
+        // });
+
+        // user.on('create', function (msg) {
+        //     let item = document.createElement('div');
+        //     item.className = "room";
+        //     item.textContent = msg;
+        //     list.appendChild(item);
+        // });
+    </script>
+</body>
+
+</html>
