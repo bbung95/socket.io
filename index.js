@@ -1,22 +1,23 @@
 const express = require("express");
 const app = express();
+const PORT = process.env.PORT||3000;
 const server = require("http").Server(app);
 const io = require("socket.io")(server);
 const { v4: uuidV4 } = require("uuid");
-const PORT = process.env.PORT
+
 //const { PeerServer } = require('peer');
 //const peerServer = PeerServer({ port: 9000, path: '/myapp' });
 
 ///// 외부 명령어 실행
 const exec = require('child_process').exec;
 
-var process = exec('peerjs --port 3001');
+var prces = exec('peerjs --port 3001');
 
-process.stdout.on('data', function(data) {
+prces.stdout.on('data', function(data) {
   console.log(data.toString());
 }); // 실행 결과
 
-process.stderr.on('data', function(data) {
+prces.stderr.on('data', function(data) {
   console.error(data.toString());
 });
 
