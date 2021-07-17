@@ -1,7 +1,7 @@
 const user = io("/");
 const videoGrid = document.getElementById("video-grid");
 const myPeer = new Peer(undefined, {
-  host: "/",
+  host: "bbung95-rtc.herokuapp.com",
   port: "3001"
 });
 
