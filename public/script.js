@@ -1,24 +1,29 @@
-const user = io("/");
+const socket = io("/");
 const videoGrid = document.getElementById("video-grid");
-const myPeer = new Peer(undefined, {
-  host: "bbung95-rtc.herokuapp.com",
-  port: "3001"
-});
-
 const myVideo = document.createElement("video");
+const peer = new Peer(undefined, {
+  path: "/peerjs",
+  host: "/",
+  port: "443",
+});
 myVideo.muted = true;
 const peers = {};
 
-// 사용자 비디오 오디오 권한 요청 
+// 1. 사용자 비디오 오디오 권한 요청
+let myVideoStream;
 navigator.mediaDevices
   .getUserMedia({
     video: true,
-    // audio: true,
+    audio: false,
   })
   .then((stream) => {
+    // 내가 접속시 비디오 표시
+    myVideoStream = stream;
     addVideoStream(myVideo, stream);
 
-    myPeer.on("call", (call) => {
+    // 접속시 접속한 유저들 비디오 표시
+    peer.on("call", (call) => {
+      console.log("접속 유저들" + call);
       call.answer(stream);
       const video = document.createElement("video");
       call.on("stream", (userVideoStream) => {
@@ -26,21 +31,24 @@ navigator.mediaDevices
       });
     });
 
-    user.on("uesr-connected", (userId) => {
+    // 다른 유저들 접속시 비디오 표시
+    socket.on("uesr-connected", (userId) => {
+      console.log("다른유저 접속시" + userId);
       connectToNewUser(userId, stream);
     });
   });
 
-user.on("user-disconnected", (userId) => {
+socket.on("user-disconnected", (userId) => {
   if (peers[userId]) peers[userId].close();
 });
 
-myPeer.on("open", (id) => {
-  user.emit("join-room", ROOM_ID, id);
+peer.on("open", (id) => {
+  socket.emit("join-room", ROOM_ID, id);
 });
 
-function connectToNewUser(userId, stream) {
-  const call = myPeer.call(userId, stream);
+// 유저 접속시 조인시 실행
+const connectToNewUser = (userId, stream) => {
+  const call = peer.call(userId, stream);
   const video = document.createElement("video");
   call.on("stream", (userVideoStream) => {
     addVideoStream(video, userVideoStream);
@@ -52,8 +60,9 @@ function connectToNewUser(userId, stream) {
   peers[userId] = call;
 }
 
-function addVideoStream(video, stream) {
-  video.srcObject = stream;
+// 비디오 생성
+const addVideoStream = (video, stream) => {
+  video.srcObject = stream; // 비디오 설정 셋팅??
   video.addEventListener("loadedmetadata", () => {
     video.play();
   });
