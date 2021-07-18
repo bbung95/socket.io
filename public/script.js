@@ -140,3 +140,7 @@ const stopVideo = () =>{
   }
 }
 ////////////////////////
+
+const leaveVideo = () =>{
+  close();
+}

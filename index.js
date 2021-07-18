@@ -32,6 +32,7 @@ io.on("connection", (socket) => {
     socket.to(roomId).emit('uesr-connected', userId);
     
     socket.on('disconnect', ()=>{
+      console.log("exit");
       socket.to(roomId).emit('user-disconnected',userId);
     })
   });
