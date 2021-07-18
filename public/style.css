@@ -72,26 +72,9 @@
     text-align: center;
 }
 
-.main__chat_window {
+.main__user_window {
     flex-grow: 1;
     overflow-y: auto;
-}
-
-.messages{
-    color: white;
-    list-style: none;
-}
-
-.main__message_container {
-    padding: 22px 12px;
-    display: flex;
-}
-
-.main__message_container input {
-    flex-grow: 1;
-    background-color: transparent;
-    border: none;
-    color: #F5F5F5;
 }
 
 .leave_meeting {

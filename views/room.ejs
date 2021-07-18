@@ -43,15 +43,15 @@
                         <i class="fas fa-microphone"></i>
                         <span>Mute</span>
                     </div>
-                    <div onclick="playStop()" class="main__controls__button main__video_button">
+                    <div onclick="stopVideo()" class="main__controls__button main__video_button">
                         <i class="fas fa-video"></i>
                         <span>Stop Video</span>
                     </div>
                 </div>
                 <div class="main__controls__block">
-                    <div class="main__controls__button">
+                    <div class="main__controls__button" onclick="shareDisplay()">
                         <i class="fas fa-shield-alt"></i>
-                        <span>Security</span>
+                        <span>화면공유</span>
                     </div>
                     <div class="main__controls__button">
                         <i class="fas fa-user-friends"></i>
@@ -71,17 +71,13 @@
         </div>
         <div class="main__right">
             <div class="main__header">
-                <h6>Chat</h6>
+                <h6>참가자 목록</h6>
             </div>
-            <div class="main__chat_window">
-                <ul class="messages">
+            <div class="main__user_window">
+                <ul class="list">
 
                 </ul>
-
-            </div>
-            <div class="main__message_container">
-                <input id="chat_message" type="text" placeholder="Type message here...">
-            </div>
+            </div>     
         </div>
     </div>
 </body>

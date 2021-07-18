@@ -4,17 +4,18 @@ const myVideo = document.createElement("video");
 const peer = new Peer(undefined, {
   path: "/peerjs",
   host: "/",
-  port: "443",
+  port: "443", // defualt 443
 });
 myVideo.muted = true;
 const peers = {};
 
 // 1. 사용자 비디오 오디오 권한 요청
-let myVideoStream;
+let myVideoStream
+let myShareStream
 navigator.mediaDevices
   .getUserMedia({
     video: true,
-    audio: false,
+    audio: true,
   })
   .then((stream) => {
     // 내가 접속시 비디오 표시
@@ -42,6 +43,12 @@ socket.on("user-disconnected", (userId) => {
   if (peers[userId]) peers[userId].close();
 });
 
+socket.on("screenShare", ()=>{
+  console.log("화면공유 클라이언트");
+  const screenVideo = document.createElement("video");
+  addVideoStream(screenVideo,myShareStream);
+})
+
 peer.on("open", (id) => {
   socket.emit("join-room", ROOM_ID, id);
 });
@@ -68,3 +75,68 @@ const addVideoStream = (video, stream) => {
   });
   videoGrid.appendChild(video);
 }
+
+// 화면공유
+const shareDisplay = ()=>{
+  navigator.mediaDevices
+  .getDisplayMedia({
+    video: true,
+    audio: true,
+  }).then((screenStream)=>{
+    myShareStream = screenStream;
+    socket.emit("screenShare", ROOM_ID);
+
+  })
+}
+
+// 마이크 뮤트
+const setMuteButton = () =>{
+  const html = '<i class="fas fa-microphone"></i>'
+    + '<span>Mute</span>';
+  document.querySelector('.main__mute_button').innerHTML = html;
+}
+
+const setUnMuteButton = () =>{
+  const html = '<i class="unmute fa-microphone"></i>'
+    + '<span>UnMute</span>';
+  document.querySelector('.main__mute_button').innerHTML = html;
+}
+
+const muteUnmute = () =>{
+
+  const enabled = myVideoStream.getAudioTracks()[0].enabled;
+  if(enabled){
+    myVideoStream.getAudioTracks()[0].enabled = false;
+    setUnMuteButton();
+  }else{
+    myVideoStream.getAudioTracks()[0].enabled = true;
+    setMuteButton();
+  }
+}
+/////////////////////////
+
+// 화면 끄기
+const setPlayVideo = () =>{
+  const html = '<i class="fas fa-video"></i>'
+      +'<span>Play Video</span>';
+  document.querySelector('.main__video_button').innerHTML = html;
+}
+
+const setStopVideo = () =>{
+  const html = '<i class="stop fa-video"></i>'
+      +'<span>Stop Video</span>';
+  document.querySelector('.main__video_button').innerHTML = html;
+}
+
+const stopVideo = () =>{
+  const enabled = myVideoStream.getVideoTracks()[0].enabled;
+
+  if(enabled){
+    myVideoStream.getVideoTracks()[0].enabled = false;
+    setPlayVideo();
+  }else{
+    myVideoStream.getVideoTracks()[0].enabled = true;
+    setStopVideo();
+  }
+}
+////////////////////////
