@@ -1,6 +1,7 @@
 const socket = io("/");
 const videoGrid = document.getElementById("video-grid");
 const myVideo = document.createElement("video");
+const screenVideo = document.createElement("video");
 const peer = new Peer(undefined, {
   path: "/peerjs",
   host: "/",
@@ -9,9 +10,9 @@ const peer = new Peer(undefined, {
 myVideo.muted = true;
 const peers = {};
 
-// 1. 사용자 비디오 오디오 권한 요청
+// 1. 사용자 비디오 오디오 권한 요청  
 let myVideoStream
-let myShareStream
+let screenShare
 navigator.mediaDevices
   .getUserMedia({
     video: true,
@@ -45,8 +46,22 @@ socket.on("user-disconnected", (userId) => {
 
 socket.on("screenShare", ()=>{
   console.log("화면공유 클라이언트");
-  const screenVideo = document.createElement("video");
-  addVideoStream(screenVideo,myShareStream);
+  addVideoStream(screenVideo, screenShare);
+
+  peer.on("call", (call) => {
+    console.log("접속 유저들" + call);
+    call.answer(stream);
+    const video = document.createElement("video");
+    call.on("stream", (userVideoStream) => {
+      addVideoStream(video, userVideoStream);
+    });
+  });
+
+  // 다른 유저들 접속시 비디오 표시
+  socket.on("uesr-connected", (userId) => {
+    console.log("다른유저 접속시" + userId);
+    connectToNewUser(userId, screenShare);
+  });
 })
 
 peer.on("open", (id) => {
@@ -67,6 +82,18 @@ const connectToNewUser = (userId, stream) => {
   peers[userId] = call;
 }
 
+// 화면공유
+const shareDisplay = ()=>{
+  navigator.mediaDevices
+  .getDisplayMedia({
+    video: true,
+  }).then((screenStream)=>{
+    screenShare = screenStream;
+    socket.emit("screenShare", ROOM_ID);
+
+  })
+}
+
 // 비디오 생성
 const addVideoStream = (video, stream) => {
   video.srcObject = stream; // 비디오 설정 셋팅??
@@ -74,19 +101,6 @@ const addVideoStream = (video, stream) => {
     video.play();
   });
   videoGrid.appendChild(video);
-}
-
-// 화면공유
-const shareDisplay = ()=>{
-  navigator.mediaDevices
-  .getDisplayMedia({
-    video: true,
-    audio: true,
-  }).then((screenStream)=>{
-    myShareStream = screenStream;
-    socket.emit("screenShare", ROOM_ID);
-
-  })
 }
 
 // 마이크 뮤트

@@ -1,16 +1,21 @@
 const express = require("express");
 const app = express();
-const PORT = process.env.PORT||3030;
+const PORT = process.env.PORT||82;
 const server = require("http").Server(app);
 const io = require("socket.io")(server, { cors: { origin: "*" } });
-//const ioo = require("socket.io")(server, { cors: { origin: "*" } });
+const AWS = require("aws-sdk");
 const mongoose = require("mongoose");
 const { v4: uuidV4 } = require("uuid");
 const { ExpressPeerServer } = require('peer');
 const peerServer = ExpressPeerServer(server, { 
   debug : true
 });
+const murter = require("multer");
+const upload = murter({dest : 'uploads/'});
 
+// aws confing
+AWS.config.loadFromPath(__dirname + "/config/awsconfig.json");
+const s3 = new AWS.S3();
 ////////////////// mongodb///////////////
 mongoose.connect(
   "mongodb+srv://mongo:mongodb@cluster0.atnbf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
@@ -30,22 +35,25 @@ db.once("open", function () { // 연결성공
   console.log("Connected!");
 });
 
-var chat = mongoose.Schema({ // chat schema
+var chat = mongoose.Schema({
   userId: "string",
   msg: "string",
   img: "string",
-  nickname: "string",
+  name: "string",
   profile: "string",
 });
 
-var list = mongoose.Schema({ // list schema
+var list = mongoose.Schema({
   userId: "string",
 });
 
-var room = mongoose.Schema({ // room schema
+var room = mongoose.Schema({
   userId: "String",
   roomNo: "string",
   target: "String",
+  name: "string",
+  profile: "string",
+  type: "string",
 });
 ////////////////////////////////////////
 
@@ -57,6 +65,20 @@ app.get("/", (req, res) => {
   res.redirect(`/${uuidV4()}`);
 });
 
+app.get("/chatList", (req,res)=>{
+  console.log("채팅목록")
+  res.render("chatList", req.query); 
+})
+
+app.get("/chat", (req,res)=>{
+  console.log("채팅입장")
+  if(req.query.type == 1){
+    res.render("chatRoom", req.query);
+  }else{
+    res.render("groupRoom", req.query);
+  }
+})
+
 app.get("/:room", (req, res) => { // 1:1 화상채팅
   res.render("room", { roomId: req.params.room });
 });
@@ -65,36 +87,18 @@ app.get("/group/:room", (req, res) => { // 그룹 화상채팅
   res.render("room", { roomId: req.params.room });
 });
 
+app.post('/upload', upload.single('uploadFile'), (req, res) => { 
+  console.log(req.file); // 클라이언트에서 넘어온 파일에 대한 정보가 req.file에 FILE 객체로 저장되어 있습니다. 
+})
+
 ///////// RTC////////////
-io.on("connection", (socket) => {
-  console.log("RTC접속");
-  socket.on("join-room", (roomId, userId) => {
-    console.log(roomId);
-    socket.join(roomId);
-    socket.to(roomId).emit('uesr-connected', userId);
-    
-    socket.on('disconnect', ()=>{
-      console.log("exit");
-      socket.to(roomId).emit('user-disconnected',userId);
-    })
-  });
-
-  socket.on("screenShare", (roomId)=>{
-    console.log("화면공유");
-    console.log(roomId);
-    io.emit('screenShare');
-  })
-});
-//////////////////////////
-
-////////// CHAT ///////////
 io.on("connection", (socket) => {
   // 접속시 io. 커넥션
   console.log("a user connected");
 
-  socket.on("roomlist", (userId) => {
+  socket.on("roomlist", (data) => {
     var Room = mongoose.model("roomlists", room);
-    Room.find({ userId: userId }, function (err, data) {
+    Room.find({ userId: data.userId, type: data.type }, function (err, data) {
       console.log(data);
       io.to(socket.id).emit("roomlist", data);
     });
@@ -106,13 +110,29 @@ io.on("connection", (socket) => {
     // room_user list 추가
 
     let Room = mongoose.model("roomlists", room);
-    let roomlist = new Room({
-      userId: msg.userId,
-      target: msg.target,
-      roomNo: `${uuidV4()}`,
-    });
+    let uuid = `${uuidV4()}`;
+    let roomlist;
+    if(msg.type == 1){
+      roomlist = new Room({
+        userId: msg.userId,
+        target: msg.target,
+        roomNo: uuid,
+        name: msg.targetName,
+        profile: msg.targetProfile,
+        type: msg.type,
+      });
+    }else{
+      roomlist = new Room({
+        userId: msg.userId,
+        target: msg.target,
+        roomNo: msg.roomNo,
+        name: msg.targetName,
+        profile: msg.targetProfile,
+        type: msg.type,
+      });
+    }
     Room.findOne(
-      { userId: msg.userId, target: msg.target },
+      { userId: msg.userId, target: msg.target, type: msg.type },
       function (error, data) {
         if (error) {
           console.log(error);
@@ -120,24 +140,23 @@ io.on("connection", (socket) => {
           if (data == null || data == "") {
             console.log("방이 없습니다.");
             roomlist.save(function (err, data) {
-              Room.findOne(
-                { userId: msg.userId, target: msg.target },
-                function (error, data) {
-                  dis = data;
-                  saveList(socket, data);
-                  console.log("ddd"+data.roomNo);
-                  io.to(socket.id).emit("roomjoin", data.roomNo);
-                  socket.join(data.roomNo, () => {});
-                }
-              );
+              // Room.findOne(
+              //   { userId: msg.userId, target: msg.target },
+              //   function (error, data) {
+              dis = data;
+              saveList(socket, data);
+              console.log("방 번호 : " + uuid);
+              io.to(socket.id).emit("roomjoin", uuid);
+              socket.join(data.roomNo);
             });
+            // });
           } else {
             console.log("방이 존재합니다.");
             dis = data;
             saveList(socket, data);
-            console.log("ddd"+data.roomNo);
+            console.log("방 번호 : " + data.roomNo);
             io.to(socket.id).emit("roomjoin", data.roomNo);
-            socket.join(data.roomNo, () => {});
+            socket.join(data.roomNo);
           }
           console.log(msg.userId + " // roomjoin");
         }
@@ -156,26 +175,31 @@ io.on("connection", (socket) => {
       userId: msg.target,
       target: msg.userId,
       roomNo: msg.roomNo,
+      name: msg.name,
+      profile: msg.profile,
+      type: msg.type,
     });
-    loadList(socket, msg);
-    Room.findOne(
-      { userId: msg.target, target: msg.userId, roomNo: msg.roomNo },
-      function (error, data) {
-        if (error) {
-          console.log(error);
-        } else {
-          if (data == null) {
-            roomlist.save(function (err, data) {});
+    if (msg.type == 1) {
+      loadList(socket, msg);
+      Room.findOne(
+        { userId: msg.target, target: msg.userId, roomNo: msg.roomNo },
+        function (error, data) {
+          if (error) {
+            console.log(error);
+          } else {
+            if (data == null) {
+              roomlist.save(function (err, data) {});
+            }
           }
         }
-      }
-    );
-    
+      );
+    }
+
     // mongodb insert
-    if(msg.img != 0 ){
-      setTimeout(chatList, 6000, msg)
-    }else{
-      chatList(msg); 
+    if (msg.img != 0) {
+      setTimeout(chatList, 6000, msg);
+    } else {
+      chatList(msg);
     }
   });
 
@@ -195,23 +219,38 @@ io.on("connection", (socket) => {
     console.log("user disconnected");
   });
 });
-///////////////////////////
 
+// 3000포트로 접속시 콘솔 출력
 server.listen(PORT, () => {
-  console.log("listening on * : 3030");
+  console.log("listening on * : 82");
 });
 
-///////////////// chat function////////////////////
+///////////////////////////////////////
+///////////////////////////////////////
+///////////////////////////////////////
+
 function chatList(msg) {
   var Chat = mongoose.model("chat_" + msg.roomNo, chat);
   console.log(msg.img);
-  var newChat = new Chat({ userId: msg.userId, msg: msg.msg , img: msg.img , nickname:msg.nickname , profile:msg.profile});
+  var newChat = new Chat({
+    userId: msg.userId,
+    msg: msg.msg,
+    img: msg.img,
+    name: msg.name,
+    profile: msg.profile,
+  });
   newChat.save(function (error, data) {
     if (error) {
       console.log(error);
     } else {
       console.log("Saved!");
-      io.to(msg.roomNo).emit("chat message", {userId : msg.userId , msg :msg.msg , img: msg.img, nickname:msg.nickname , profile:msg.profile});
+      io.to(msg.roomNo).emit("chat message", {
+        userId: msg.userId,
+        msg: msg.msg,
+        img: msg.img,
+        name: msg.name,
+        profile: msg.profile,
+      });
     }
   });
 }
@@ -236,8 +275,8 @@ function loadList(socket, msg) {
     if (error) {
       console.log(error);
     } else {
-      console.log("유저리스트"+data);
-      if(data == null || data == ''){
+      console.log("유저리스트" + data);
+      if (data == null || data == "") {
         console.log("채팅 알림");
         io.to(msg.roomNo).emit("chat notice", msg);
       }
@@ -274,14 +313,3 @@ function saveList(socket, data) {
   //loadList(socket, data);
   loadChat(socket, data);
 }
-
-///// 외부 명령어 실행
-// const exec = require('child_process').exec;
-// var prces = exec('peerjs --port 3001');
-// prces.stdout.on('data', function(data) {
-//   console.log(data.toString());
-// }); // 실행 결과
-// prces.stderr.on('data', function(data) {
-//   console.error(data.toString());
-// });
-//////
