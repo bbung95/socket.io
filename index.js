@@ -1,17 +1,17 @@
 const express = require("express");
 const app = express();
-const PORT = process.env.PORT||82;
+const PORT = process.env.PORT || 82;
 const server = require("http").Server(app);
 const io = require("socket.io")(server, { cors: { origin: "*" } });
 const AWS = require("aws-sdk");
 const mongoose = require("mongoose");
 const { v4: uuidV4 } = require("uuid");
-const { ExpressPeerServer } = require('peer');
-const peerServer = ExpressPeerServer(server, { 
-  debug : true
+const { ExpressPeerServer } = require("peer");
+const peerServer = ExpressPeerServer(server, {
+  debug: true,
 });
 const murter = require("multer");
-const upload = murter({dest : 'uploads/'});
+const upload = murter({ dest: "uploads/" });
 
 // aws confing
 AWS.config.loadFromPath(__dirname + "/config/awsconfig.json");
@@ -27,11 +27,13 @@ mongoose.connect(
 
 var db = mongoose.connection;
 
-db.on("error", function () { // 연결실패
+db.on("error", function () {
+  // 연결실패
   console.log("Connection Failed!");
 });
 
-db.once("open", function () { // 연결성공
+db.once("open", function () {
+  // 연결성공
   console.log("Connected!");
 });
 
@@ -65,51 +67,46 @@ app.get("/", (req, res) => {
   res.redirect(`/${uuidV4()}`);
 });
 
-app.get("/chatList", (req,res)=>{
-  console.log("채팅목록")
-  res.render("chatList", req.query); 
-})
+app.get("/chatList", (req, res) => {
+  console.log("채팅목록");
+  res.render("chatList", req.query);
+});
 
-app.get("/chat", (req,res)=>{
-  console.log("채팅입장")
-  if(req.query.type == 1){
+app.get("/chat", (req, res) => {
+  console.log("채팅입장");
+  if (req.query.type == 1) {
     res.render("chatRoom", req.query);
-  }else{
+  } else {
     res.render("groupRoom", req.query);
   }
-})
+});
 
-app.get("/:room", (req, res) => { // 1:1 화상채팅
+app.get("/:room", (req, res) => {
+  // 1:1 화상채팅
   res.render("room", { roomId: req.params.room });
 });
 
-app.get("/group/:room", (req, res) => { // 그룹 화상채팅
+app.get("/group/:room", (req, res) => {
+  // 그룹 화상채팅
   res.render("room", { roomId: req.params.room });
 });
 
-app.post('/upload', upload.single('uploadFile'), (req, res) => { 
-  console.log(req.file); // 클라이언트에서 넘어온 파일에 대한 정보가 req.file에 FILE 객체로 저장되어 있습니다. 
-})
+app.post("/upload", upload.single("uploadFile"), (req, res) => {
+  console.log(req.file); // 클라이언트에서 넘어온 파일에 대한 정보가 req.file에 FILE 객체로 저장되어 있습니다.
+});
 
 ///////// RTC////////////
 
-io.on('connection', socket => {
-  socket.on('join-room', (roomId, userId) => {
-    socket.join(roomId)
-    socket.to(roomId).broadcast.emit('user-connected', userId);
+io.on("connection", (socket) => {
+  socket.on("join-room", (roomId, userId) => {
+    socket.join(roomId);
+    socket.to(roomId).broadcast.emit("user-connected", userId);
     // messages
-    socket.on('message', (message) => {
-      //send message to the same room
-      io.to(roomId).emit('createMessage', message)
-  }); 
-
-    socket.on('disconnect', () => {
-      socket.to(roomId).broadcast.emit('user-disconnected', userId)
-    })
-  })
-})
-
-
+    socket.on("disconnect", () => {
+      socket.to(roomId).broadcast.emit("user-disconnected", userId);
+    });
+  });
+});
 
 ////////// CHAT//////////
 io.on("connection", (socket) => {
@@ -132,7 +129,7 @@ io.on("connection", (socket) => {
     let Room = mongoose.model("roomlists", room);
     let uuid = `${uuidV4()}`;
     let roomlist;
-    if(msg.type == 1){
+    if (msg.type == 1) {
       roomlist = new Room({
         userId: msg.userId,
         target: msg.target,
@@ -141,7 +138,7 @@ io.on("connection", (socket) => {
         profile: msg.targetProfile,
         type: msg.type,
       });
-    }else{
+    } else {
       roomlist = new Room({
         userId: msg.userId,
         target: msg.target,
