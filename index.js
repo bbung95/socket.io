@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const PORT = process.env.PORT || 82;
+const PORT = process.env.PORT || 3030;
 const server = require("http").Server(app);
 const io = require("socket.io")(server, { cors: { origin: "*" } });
 const AWS = require("aws-sdk");
@@ -95,24 +95,24 @@ app.post("/upload", upload.single("uploadFile"), (req, res) => {
   console.log(req.file); // 클라이언트에서 넘어온 파일에 대한 정보가 req.file에 FILE 객체로 저장되어 있습니다.
 });
 
-///////// RTC////////////
 
-io.on("connection", (socket) => {
-  socket.on("join-room", (roomId, userId) => {
-    socket.join(roomId);
-    socket.to(roomId).broadcast.emit("user-connected", userId);
-    // messages
-    socket.on("disconnect", () => {
-      socket.to(roomId).broadcast.emit("user-disconnected", userId);
-    });
-  });
-});
-
-////////// CHAT//////////
 io.on("connection", (socket) => {
   // 접속시 io. 커넥션
   console.log("a user connected");
-
+  
+  
+  ///////// RTC////////////
+  socket.on("join-room", (roomId, userId) => {
+    socket.join(roomId);
+    socket.to(roomId).emit("user-connected", userId);
+    
+    socket.on("disconnect", () => {
+      socket.to(roomId).emit("user-disconnected", userId);
+    });
+  });
+  
+  
+  ////////// CHAT//////////
   socket.on("roomlist", (data) => {
     var Room = mongoose.model("roomlists", room);
     Room.find({ userId: data.userId, type: data.type }, function (err, data) {

@@ -34,7 +34,7 @@ navigator.mediaDevices
     });
 
     // 다른 유저들 접속시 비디오 표시
-    socket.on("uesr-connected", (userId) => {
+    socket.on("user-connected", (userId) => {
       console.log("다른유저 접속시" + userId);
       connectToNewUser(userId, stream);
     });
@@ -65,6 +65,7 @@ socket.on("screenShare", ()=>{
 })
 
 peer.on("open", (id) => {
+  console.log(ROOM_ID + id);
   socket.emit("join-room", ROOM_ID, id);
 });
 
