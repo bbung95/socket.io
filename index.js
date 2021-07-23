@@ -92,6 +92,26 @@ app.post('/upload', upload.single('uploadFile'), (req, res) => {
 })
 
 ///////// RTC////////////
+
+io.on('connection', socket => {
+  socket.on('join-room', (roomId, userId) => {
+    socket.join(roomId)
+    socket.to(roomId).broadcast.emit('user-connected', userId);
+    // messages
+    socket.on('message', (message) => {
+      //send message to the same room
+      io.to(roomId).emit('createMessage', message)
+  }); 
+
+    socket.on('disconnect', () => {
+      socket.to(roomId).broadcast.emit('user-disconnected', userId)
+    })
+  })
+})
+
+
+
+////////// CHAT//////////
 io.on("connection", (socket) => {
   // 접속시 io. 커넥션
   console.log("a user connected");
