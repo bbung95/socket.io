@@ -14,7 +14,7 @@ const murter = require("multer");
 const upload = murter({ dest: "uploads/" });
 
 // aws confing
-AWS.config.loadFromPath(__dirname + "/config/awsconfig.json");
+//AWS.config.loadFromPath(__dirname + "/config/awsconfig.json");
 const s3 = new AWS.S3();
 ////////////////// mongodb///////////////
 mongoose.connect(
