@@ -1,139 +1,193 @@
 <!DOCTYPE html>
+
 <head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>무피채팅방</title>
-<style>
-#main {
-	margin: 0px;
-	padding-bottom: 3rem;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-		Helvetica, Arial, sans-serif;
-}
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>무피채팅방</title>
 
-#form {
-	background: rgba(0, 0, 0, 0.15);
-	padding: 0.25rem;
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	display: flex;
-	height: 3rem;
-	box-sizing: border-box;
-	backdrop-filter: blur(10px);
-}
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <!-- jQuery fancyapps -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" />
 
-#input {
-	border: none;
-	padding: 0 1rem;
-	flex-grow: 1;
-	border-radius: 2rem;
-	margin: 0.25rem;
-}
 
-#input:focus {
-	outline: none;
-}
+  <style>
+    #main {
+      margin: 0px;
+      padding-bottom: 140px;
+      padding-top: 60px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
+      height: 100%;
+    }
 
-#form>button {
-	background: #333;
-	border: none;
-	padding: 0 1rem;
-	margin: 0.25rem;
-	border-radius: 3px;
-	outline: none;
-	color: #fff;
-}
+    #form {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 140px;
+      box-sizing: border-box;
+      background: white;
+    }
 
-#messages {
-	list-style-type: none;
-	margin: 0;
-	padding: 0;
-}
+    #input {
+      margin: 10px;
+      background: gray;
+      height: 80px;
+      resize: none;
+      width: 80%;
+    }
 
-#messages>li {
-	padding: 0.5rem 1rem;
-}
+    #topbar {
+      background: #edf3f8;
+      height: 60px;
+    }
 
-#backbtn{
-	position: fixed;
-	height: 40px;
-}
+    #btnbar {
+      height: 40px;
+      background: #f2f2f2;
+      padding: 5px;
+    }
 
-.message {
-	position: relative;
-	background: #edf3f8;
-	border-radius: .4em;
-	margin-left: 60px;
-	margin-top: -7px;
-	padding: 10px;
-	display: inline-block;
-	border-radius: 5px;
-}
+    #btnbar>button {
 
-.opponent:after {
-	content: '';
-	position: absolute;
-	left: 0;
-	top: 20px;
-	width: 0;
-	height: 0;
-	border: 14px solid transparent;
-	border-right-color: #edf3f8;
-	border-left: 0;
-	border-top: 0;
-	margin-top: -15px;
-	margin-left: -14px;
-}
+      height: 100%;
+    }
 
-</style>
-<script src="https://code.jquery.com/jquery-2.2.4.js"
-	integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI="
-	crossorigin="anonymous"></script>
+    #messages {
+      list-style-type: none;
+      margin: 0 auto;
+      padding: 0;
+    }
+
+    #messages>li {
+      padding: 0.5rem 1rem;
+    }
+
+    #sendbtn {
+      position: fixed;
+      width: 80px;
+      height: 80px;
+      bottom: 0;
+      right: 0;
+      border-radius: 10px;
+      background: #dbdbd9;
+      margin: 10px;
+    }
+
+    #sendbtn:hover {
+      background: #cfcfca;
+    }
+
+    .message {
+      position: relative;
+      background: #edf3f8;
+      border-radius: .4em;
+      margin-top: -7px;
+      margin-left: 8px;
+      margin-right: 8px;
+      display: inline-block;
+      border-radius: 5px;
+      max-width: 80%;
+
+    }
+
+    .opponent:after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 20px;
+      width: 0;
+      height: 0;
+      border: 14px solid transparent;
+      border-right-color: #edf3f8;
+      border-left: 0;
+      border-top: 0;
+      margin-top: -15px;
+      margin-left: -14px;
+    }
+
+    pre {
+      white-space: normal;
+      word-break: break-all;
+      padding-left: 15px;
+      padding-right: 15px;
+      text-align: left;
+      font-size: 15px;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .imgs {
+      border-radius: 10px;
+      margin-left: 8px;
+      margin-right: 8px;
+    }
+
+    .message_left_margin {
+
+      margin-left: 60px;
+    }
+
+    .date {
+
+      font-size: 9px;
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI="
+    crossorigin="anonymous"></script>
 
 </head>
 
 <body>
-	<div id="main">
-		<div id="backbtn"><img src="/images/back_btn.png"
-			style="height: 40px; margin-left: -5px;"></div>
-		<ul id="messages"></ul>
-		<form id="form" action="">
-			<button class="uploadbtn" type="button">+</button>
-			<button class="videobtn" type="button">call</button>
-			<input id="name" type="hidden" value="" /> <input id="input"
-				type="text" autocomplete="off" />
-			<button>send</button>
-		</form>
-		<form id="upload" action="" method="post"
-			enctype="multipart/form-data">
-			<input type="file" id="uploadFile" name="uploadFile"
-				style="display: none;" accept="image/*" />
-		</form>
-	</div>
-	<!-- socket io 서버를 설정-->
-	<script src="/socket.io/socket.io.js"></script>
+  <div id="topbar" class="fixed-top"><img src='/imgFile/1627202369867.png'
+      style='width:50px; height:50px; border-radius: 35%; margin: 5px 10px 5px 15px;' />
+    <%= trgtName %>
+  </div>
+  <div id="main">
+    <ul id="messages"></ul>
+    <form id="form" action="">
+      <div id="btnbar" align="right">
+        <button type="button" type="button" class="btn btn-light uploadbtn">+</button>
+        <button type="button" type="button" class="btn btn-light videobtn">call</button>
+      </div>
 
-	<script>
+      <input id="name" type="hidden" value="" /><textarea id="input"></textarea>
+      <span><button id="sendbtn" class="btn btn-light">전송</button></span>
+    </form>
+    <form id="upload" action="" method="post" enctype="multipart/form-data">
+      <input type="file" id="uploadFile" name="uploadFile" style="display: none;" accept="image/*" />
+    </form>
+  </div>
+
+  <!-- jQuery fancyapps -->
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+  crossorigin="anonymous"></script>
+  <!-- socket io 서버를 설정-->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
 
     let userId = "<%= userId %>";
-  	let name = "<%= name %>";
-	  let profile = "<%= profile %>";
-  	let type = "<%= type %>";
+    let name = "<%= name %>"
+    let profile = "<%= profile %>";
+    let type = "<%= type %>";
     let target = "<%= trgt %>"; // 알림대상 - 대화상대
-  	let targetName = "<%= trgtName %>";
-  	let targetProfile = "<%= trgtProfile %>";
+    let targetName = "<%= trgtName %>";
+    let targetProfile = "<%= trgtProfile %>";
     let roomNo = "<%= roomNo %>";
-    
+
     let input = document.getElementById('input');
-	
+
     let socket = io();
 
-    socket.emit('roomjoin', { userId: userId, target : target, targetName: targetName , targetProfile: targetProfile , type :type ,roomNo: roomNo});
-    socket.on('roomjoin', function(data){
-    	roomNo = data;
+    socket.emit('roomjoin', { userId: userId, target: target, targetName: targetName, targetProfile: targetProfile, type: type , roomNo: roomNo});
+    socket.on('roomjoin', function (data) {
+      roomNo = data;
     });
 
     // submit시 action이 아닌 행동(preventDefault)취소 
@@ -143,183 +197,211 @@
 
       if (input.value) {
         // user의 메세지를 'chat message'로 서버로 보낸다(?) 
-        socket.emit('chat message', 
-        		{ userId: userId, name: name, profile: profile, msg: input.value,
-        		img: "0", roomNo: roomNo ,target:target , targetName: targetName, targetProfile: targetProfile , type: type});
-        input.value = '';    
+        socket.emit('chat message',
+          {
+            userId: userId, name: name, profile: profile, msg: input.value,
+            img: "0", roomNo: roomNo, target: target, targetName: targetName, targetProfile: targetProfile, type: type
+          });
+          input.value = '';
+          $('#input').focus();
       }
     });
-	
-   // 메시지 출력 함수
-    function message (data){
-    	let output = '';
-        if(data.userId == userId){
-            output += "<li align='right'>";
-          	  output += "<div class='message'>";
-            if(data.img != 0){
-                output += "<img src='/images/uploadFiles/chat/"+data.img+"' width='200' height='200'/>";          
-            }else{
-          	  output += data.msg;
-            }
-        }else{
-       	 output += "<li>";
-       	 output += "<div style='display:flex; align-items: center'><img src='/images/uploadFiles/"+data.profile+"' style='width:40px; height:40px; border-radius: 50%; margin-right: 5px;' >"
-       	 output += data.name+"</div><div class='message opponent'>";	
-     	   if(data.img != 0){
-      	      output += "<img src='/images/uploadFiles/chat/"+data.img+"' width='200'/>";          
-      	  }else{
-      		  output += data.msg;
-       	 }
-        }
-        output += "</div></li>";
-        $(output).appendTo('#messages');
-        window.scrollTo(0, document.body.scrollHeight);
+
+    $("#input").keypress(function(key) {
+
+      if (key.shiftKey && key.keyCode == 13) {//키가 13이면 실행 (엔터는 13)
+        return;
+      }else if(key.keyCode == 13){
+        $('#sendbtn').click();
       }
-   
-    socket.on('loadchat',(datas)=>{
-        for (var i = 0; i < datas.length; i++) {
-        	let data = datas[i];
-        		message(data);
-        }
-     });
-    	
-     socket.on('chat message', function (data) {
-    	 message (data)
+
     });
-    
-     // 메세지 보낼시 알림
-    socket.on('chat notice', (msg)=>{
-      console.log("알림입니다~");
+
+
+    let outuser = '';
+    // 메시지 출력 함수
+    function message(data) {
+      let output = '';
+
+      if (data.userId == userId) {
+        outuser = data.userId;
+        output += "<li align='right'>";
+        if (data.img != 0) {
+          output += `<span class="date" style="">${data.date}</span><a href="/imgFile/${data.img}"><img class='imgs' data-fancybox src='/imgFile/${data.img}' width='200'/></a>`;
+        } else {
+          output += `<span class="date">${data.date}</span><div class='message'>`;
+          output += "<pre>" + data.msg + "</pre></div>";
+        }
+      } else {
+        output += "<li>";
+        if (outuser != data.userId) {
+          output += "<div style='align-items: center'><img src='/imgFile/" + data.profile + "' style='width:40px; height:40px; border-radius: 30%; margin-right: 5px;' >"
+          output += data.name + "</div>"
+        }
+        if (data.img != 0) {
+          output += `<a href="/imgFile/${data.img}"><img class='imgs message_left_margin' src='/imgFile/${data.img}' width='200'/></a><span class="date">${data.date}</span>`;
+        } else {
+          if (outuser != data.userId) {
+            output += "<div class='message opponent message_left_margin'>";
+          } else {
+            output += "<div class='message message_left_margin'>";
+          }
+          output += `<pre>${data.msg}</pre></div><span class="date">${data.date}</span>`;
+        }
+        outuser = data.userId;
+      }
+      output += "</li>";
+      $(output).appendTo('#messages');
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    socket.on('loadchat', (datas) => {
+      for (var i = 0; i < datas.length; i++) {
+        let data = datas[i];
+        message(data);
+      }
+    });
+
+    socket.on('chat message', function (data) {
+      message(data)
+    });
+
+    // 메세지 보낼시 알림
+    // socket.on('chat notice', (msg)=>{
+    //   console.log("알림입니다~");
+    //   $.ajax({
+    //     url: "/common/json/addNotice",
+    //     method : "POST",
+    //     contentType : "application/JSON",
+    //     data : JSON.stringify({"toUserId" : msg.target,
+    //             "noticeContent" : msg.msg,
+    //             "noticeUser" : {"userId": msg.userId},
+    //             "noticeType" : "1"}),
+    //     dataType : "text",
+    //     success: function(form, state){
+    //       //alert(state);
+    //     }
+    //   });
+    // });
+
+    function upload(formData) {
+      // formData key &value 확인
+      // for (var key of formData.keys()) {
+      //   console.log(key);
+      // }
+      // for (var value of formData.values()) {
+      //   console.log(value);
+      // } 
       $.ajax({
-        url: "/common/json/addNotice",
-        method : "POST",
-        contentType : "application/JSON",
-        data : JSON.stringify({"toUserId" : msg.target,
-                "noticeContent" : msg.msg,
-                "noticeUser" : {"userId": msg.userId},
-                "noticeType" : "1"}),
-        dataType : "text",
-        success: function(form, state){
-          //alert(state);
+        url: "/upload"
+        , method: "POST"
+        , processData: false
+        , contentType: false
+        , data: formData
+        , dataType: 'JSON'
+        , success: function (data, state) {
+
+          socket.emit('chat message', {
+            userId: userId, name: name, profile: profile, msg: "이미지를 보냈습니다",
+            img: data.filename, roomNo: roomNo, target: target, targetName: targetName, targetProfile: targetProfile
+          });
         }
       });
-    });
-    
-    function upload(formData){
-    	// formData key &value 확인
-    	/* for (var key of formData.keys()) {
-    	  console.log(key);
-    	}
-    	for (var value of formData.values()) {
-    	  console.log(value);
-    	} */
-    	$.ajax({
-                url : "/common/json/fileUpload"
-                    , method : "POST"
-                    , processData : false
-                    , contentType : false
-                    , data : formData
-                    , dataType: 'text'
-                    , success:function(data, state) {
-                        socket.emit('chat message', { userId: userId, name: name, profile: profile, msg: "이미지를 보냈습니다",
-                        	img: data, roomNo: roomNo ,target:target, targetName: targetName, targetProfile: targetProfile});
-                    }
-          });
     }
-    
-    $('.uploadbtn').on('click', function(){
-    	$('#uploadFile').click();
+
+    $('.uploadbtn').on('click', function () {
+      $('#uploadFile').click();
     });
-    
-    $('#uploadFile').change(function(){
-    	//alert("업로드");
-    	let form = $('#upload');
-    	let formData = new FormData(form[0]);
-    	upload(formData);
+
+    $('#uploadFile').change(function () {
+      //alert("업로드");
+      let form = $('#upload');
+      let formData = new FormData(form[0]);
+      upload(formData);
     });
-    
+
     /////// drag & drop event
-    
-    $(document).on("dragenter", function(e){
-     	 e.preventDefault();
-     	 e.stopPropagation();
- 	}).on("dragover", function(e){
-     	 e.preventDefault();
-     	 e.stopPropagation();
-     	 $(this).css("background-color", "#FFD8D8");
- 	}).on("dragleave", function(e){
-     	 e.preventDefault();
-     	 e.stopPropagation();
-    	  $(this).css("background-color", "#FFF");
-	 }).on("drop", function(e){
-		  e.preventDefault();
-     	 $(this).css("background-color", "#FFF");
-      	let file = e.originalEvent.dataTransfer.files[0];
-     	 if(file != null){
-     		 if(file.length < 1){
-     			 alert("파일이 존재하지 않습니다.");
-     			 return;
-     		 }else{
-     		 	if(confirm("이미지를 업로드 하시겠습니까")){
-     		    	let formData = new FormData();
-     		    	formData.append("uploadFile", file);
-     				upload(formData);
-     		 	}
-     		 }
-     	 }
-	 });
+
+    $(document).on("dragenter", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }).on("dragover", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      $('#main').css("background-color", "#e1e6eb");
+    }).on("dragleave", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      $('#main').css("background-color", "#FFF");
+    }).on("drop", function (e) {
+      e.preventDefault();
+      $('#main').css("background-color", "#FFF");
+      let file = e.originalEvent.dataTransfer.files[0];
+      if (file != null) {
+        if (file.length < 1) {
+          alert("파일이 존재하지 않습니다.");
+          return;
+        } else {
+          if (confirm("이미지를 업로드 하시겠습니까")) {
+            let formData = new FormData();
+            formData.append("uploadFile", file);
+            upload(formData);
+          }
+        }
+      }
+    });
     ///////
-    
-    $('.videobtn').on('click', function(){
-    	popWin = window.open(
-				"https://bbung95-rtc.herokuapp.com/"+roomNo,
-				//"http://localhost:3030/"+roomNo,
-				"videoChat",
-		"left=1000, top=300, width=1000, height=800, marginwidth=0, marginheight=0, scrollbars=no, scrolling=no, menubar=no, resizable=no");
+
+    $('.videobtn').on('click', function () {
+      popWin = window.open(
+        "/" + roomNo,
+        //"http://localhost:3030/"+roomNo,
+        "videoChat",
+        "left=1000, top=300, width=1000, height=800, marginwidth=0, marginheight=0, scrollbars=no, scrolling=no, menubar=no, resizable=no");
 
     })
-    
-    $('#backbtn').on('click', function(){
-    	location.href="/chat/chatList";
+
+    $('#backbtn').on('click', function () {
+      location.href = `/chatList?userId=${userId}`;
     })
-    
+
     // 이미지 다중 업로드 //////////////////////////////
     /* socket.on('loadchat',(data)=>{
     for (var i = 0; i < data.length; i++) {
       let item = document.createElement('li');
      console.log(data[i]);
       if(data[i].img != 0){
-      	let imgs = data[i].img.split("/");
-      	console.log(imgs.length);
-      	item.textContent = data[i].userId+" : ";
-      	for(var j = 0; j<imgs.length; j++){
-      		item.textContent += "<img src='/images/uploadFiles/"+imgs[j]+"' width='100' height='100'/>;
-      	}
+        let imgs = data[i].img.split("/");
+        console.log(imgs.length);
+        item.textContent = data[i].userId+" : ";
+        for(var j = 0; j<imgs.length; j++){
+          item.textContent += "<img src='/images/uploadFiles/"+imgs[j]+"' width='100' height='100'/>;
+        }
       }else{
-     	 	item.textContent = data[i].userId+" : "+data[i].msg;
+            item.textContent = data[i].userId+" : "+data[i].msg;
       }
       messages.appendChild(item);
       window.scrollTo(0, document.body.scrollHeight);
     }
   }) */
-	
+
   // 서버에서 다시 보내온 'chat message' 데이터를 읽어온다.
- /*  socket.on('chat message', function (msg) {
-  	let item = document.createElement('li');
-  	/if(data[i].img == null || data[i].img != ""){
-      	let img = data[i].img.split("/");
-      	item.textContent = data[i].userId+" : ";
-      	for(var j = 0; j<img.length; j++){
-      		item.textContent += "<img src='/images/uploadFiles/"+img[j]+"' width='100' height='100'/>;
-      	}
-      }else{ 
-     	 	item.textContent = data.userId+" : "+data[i].msg;
-      }
-    messages.appendChild(item);
-    window.scrollTo(0, document.body.scrollHeight);
-  }); */
+    /*  socket.on('chat message', function (msg) {
+       let item = document.createElement('li');
+       /if(data[i].img == null || data[i].img != ""){
+           let img = data[i].img.split("/");
+           item.textContent = data[i].userId+" : ";
+           for(var j = 0; j<img.length; j++){
+             item.textContent += "<img src='/images/uploadFiles/"+img[j]+"' width='100' height='100'/>;
+           }
+         }else{
+               item.textContent = data.userId+" : "+data[i].msg;
+         }
+       messages.appendChild(item);
+       window.scrollTo(0, document.body.scrollHeight);
+     }); */
     //////////////////////////////////
-    
+
     // 알림
     // function notify(msg) {
     //   if (Notification.permission !== "denied") {

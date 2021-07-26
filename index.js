@@ -1,21 +1,42 @@
 const express = require("express");
 const app = express();
-const PORT = process.env.PORT || 3030;
+const PORT = process.env.PORT || 82;
 const server = require("http").Server(app);
 const io = require("socket.io")(server, { cors: { origin: "*" } });
-const AWS = require("aws-sdk");
 const mongoose = require("mongoose");
 const { v4: uuidV4 } = require("uuid");
 const { ExpressPeerServer } = require("peer");
 const peerServer = ExpressPeerServer(server, {
   debug: true,
 });
-const murter = require("multer");
-const upload = murter({ dest: "uploads/" });
 
-// aws confing
-//AWS.config.loadFromPath(__dirname + "/config/awsconfig.json");
-const s3 = new AWS.S3();
+// 업로드
+const multer = require("multer");
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, __dirname + "/public/imgFile");
+    },
+    filename: function (req, file, cb) {
+      cb(
+        null,
+        new Date().valueOf() +
+          file.originalname.slice(
+            file.originalname.lastIndexOf("."),
+            file.originalname.length
+          )
+      );
+    },
+  }),
+});
+
+// 현재시간
+const moment = require("moment");
+require("moment-timezone");
+moment.tz.setDefault("Asia/Seoul");
+var date = moment().format('a HH:mm');
+
+
 ////////////////// mongodb///////////////
 mongoose.connect(
   "mongodb+srv://mongo:mongodb@cluster0.atnbf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
@@ -43,6 +64,7 @@ var chat = mongoose.Schema({
   img: "string",
   name: "string",
   profile: "string",
+  date : "string",
 });
 
 var list = mongoose.Schema({
@@ -68,12 +90,14 @@ app.get("/", (req, res) => {
 });
 
 app.get("/chatList", (req, res) => {
+  console.log(req.query);
   console.log("채팅목록");
   res.render("chatList", req.query);
 });
 
 app.get("/chat", (req, res) => {
   console.log("채팅입장");
+  console.log(req.query);
   if (req.query.type == 1) {
     res.render("chatRoom", req.query);
   } else {
@@ -93,25 +117,30 @@ app.get("/group/:room", (req, res) => {
 
 app.post("/upload", upload.single("uploadFile"), (req, res) => {
   console.log(req.file); // 클라이언트에서 넘어온 파일에 대한 정보가 req.file에 FILE 객체로 저장되어 있습니다.
+  res.send(req.file);
 });
-
 
 io.on("connection", (socket) => {
   // 접속시 io. 커넥션
   console.log("a user connected");
-  
-  
+
   ///////// RTC////////////
   socket.on("join-room", (roomId, userId) => {
     socket.join(roomId);
     socket.to(roomId).emit("user-connected", userId);
+
+    
     
     socket.on("disconnect", () => {
       socket.to(roomId).emit("user-disconnected", userId);
     });
   });
   
-  
+  socket.on("screenShare", (roomId, screenStream)=>{
+    console.log(screenStream);
+    io.emit("screenShare");
+  })
+
   ////////// CHAT//////////
   socket.on("roomlist", (data) => {
     var Room = mongoose.model("roomlists", room);
@@ -214,7 +243,7 @@ io.on("connection", (socket) => {
 
     // mongodb insert
     if (msg.img != 0) {
-      setTimeout(chatList, 6000, msg);
+      setTimeout(chatList, 3000, msg);
     } else {
       chatList(msg);
     }
@@ -255,6 +284,7 @@ function chatList(msg) {
     img: msg.img,
     name: msg.name,
     profile: msg.profile,
+    date : date,
   });
   newChat.save(function (error, data) {
     if (error) {
@@ -267,6 +297,7 @@ function chatList(msg) {
         img: msg.img,
         name: msg.name,
         profile: msg.profile,
+        date: date,
       });
     }
   });
