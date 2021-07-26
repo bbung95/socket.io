@@ -2,14 +2,15 @@ const socket = io("/");
 const videoGrid = document.getElementById("video-grid");
 const myVideo = document.createElement("video");
 const screenVideo = document.createElement("video");
-let userId;
+let myUserId;
 const peer = new Peer(undefined, {
   path: "/peerjs",
   host: "/",
-  port: "82", // defualt 443
+  port: "443", // defualt 443
 });
+
 myVideo.muted = true;
-const peers = {};
+const peers = [];
 
 // 1. 사용자 비디오 오디오 권한 요청  
 let myVideoStream;
@@ -26,7 +27,8 @@ navigator.mediaDevices
 
     // 접속시 접속한 유저들 비디오 표시
     peer.on("call", (call) => {
-      console.log("접속 유저들" + call);
+      console.log("접속 유저들");
+      console.log(call);
 
       call.answer(stream);
       const video = document.createElement("video");
@@ -37,27 +39,28 @@ navigator.mediaDevices
 
     // 다른 유저들 접속시 비디오 표시
     socket.on("user-connected", (userId) => {
+      peers.push(userId);     
       console.log("다른유저 접속시" + userId);
-      myUserId = userId;
       connectToNewUser(userId, stream);
     });
   });
-
-socket.on("user-disconnected", (userId) => {
-  if (peers[userId]) peers[userId].close();
-});
-
-
-////// 화면 공유
-socket.on("screenShare", (screenStream)=>{
-  console.log("화면공유 클라이언트");
-  addVideoStream(screenVideo, screenStream);
-  console.log(screenStream);
-})
-
-peer.on("open", (id) => {
-  console.log(ROOM_ID + id);
-  socket.emit("join-room", ROOM_ID, id);
+  
+  socket.on("user-disconnected", (userId) => {
+    console.log("연결종료");
+    if (peers[userId]) peers[userId].close();
+  });
+  
+  
+  ////// 화면 공유
+  socket.on("screenShare", (screenStream)=>{
+    console.log("화면공유 클라이언트");
+    addVideoStream(screenVideo, screenStream);
+    console.log(screenStream);
+  })
+  
+  peer.on("open", (id) => {
+    console.log(ROOM_ID + id);
+    socket.emit("join-room", ROOM_ID, id);
 });
 
 
@@ -76,25 +79,56 @@ const connectToNewUser = (userId, stream) => {
 }
 
 // 화면공유
-const shareDisplay = async()=>{
-  screenShare = await navigator.mediaDevices.getDisplayMedia();
+const shareDisplay = ()=>{
 
-  connectToNewUser(myUserId,screenShare);
-
-  const call = peer.call(myUserId, screenShare);
-  const video = document.createElement("video");
-  call.on("stream", (userVideoStream) => {
-    addVideoStream(video, userVideoStream);
-  });
-  call.on("close", () => {
-    video.remove();
+  const peer =  new Peer(undefined, {
+    path: "/peerjs",
+    host: "/",
+    port: "443", // defualt 443
   });
 
+  navigator.mediaDevices
+  .getDisplayMedia({
+    video: true,
+  })
+  .then((stream) => {
 
+    screenShare = stream
+    // 내가 접속시 비디오 표시
+    
+    addVideoStream(screenVideo, stream);
+
+    // 접속시 접속한 유저들 비디오 표시
+    for(var i in peers){
+      console.log("피어반복");
+      peer.call(i, stream);
+    }
+
+    peer.on("call", (call) => {
+      console.log("접속 유저들");
+      console.log(call);
+
+      call.answer(stream);
+      const video = document.createElement("video");
+      call.on("stream", (userVideoStream) => {
+        addVideoStream(video, userVideoStream);
+      });
+    });
+
+    // // 다른 유저들 접속시 비디오 표시
+    // socket.on("user-connected", (userId) => {
+    //   myUserId = userId;
+    //   console.log("다른유저 접속시" + userId);
+    //   connectToNewUser(userId, stream);
+    // });
+  });
 }
+
 
 // 비디오 생성
 const addVideoStream = (video, stream) => {
+
+  console.log("비디오 생성")
   video.srcObject = stream; // 비디오 설정 셋팅??
   video.addEventListener("loadedmetadata", () => {
     video.play();
