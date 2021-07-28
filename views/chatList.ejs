@@ -81,7 +81,7 @@
             <div id="sidebar" class="d-flex flex-column flex-shrink-0 bg-light fixed-left"
                 style="width: 4.5rem; height: 100%;">
                 
-                    <img style="margin: 5px 5px 5px 7px; width:45px; height: 45px; border-radius: 50%;" src="/imgFile/1627202369867.png"></img>
+                    <img style="margin: 5px 5px 5px 7px; width:45px; height: 45px; border-radius: 50%;" src="http://127.0.0.1:8080/images/uploadFiles/<%= profile %>"></img>
                 
                 <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
                     <li class="nav-item">
@@ -146,12 +146,9 @@
                                 <a href="#" class="list-group-item list-group-item-action py-3 lh-tight"
                             aria-current="true">
                             <div class="d-flex w-100 align-items-center">
-                                <img style="margin: 5px; width:50px; height: 50px; border-radius: 50%;" src="127.0.0.1:8080/imageFiles/uploadFiles/${data[i].targetProfile}"></img>
+                                <img style="margin: 5px; width:50px; height: 50px; border-radius: 50%;" src="http://127.0.0.1:8080/images/uploadFiles/${data[i].profile}"></img>
                                 <strong class="mb-1">${data[i].name}</strong>
                                 <small align="right" >2021-07-22</small>
-                            </div>
-                            <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and
-                                date.
                             </div>
                         </a>
                     </div>`

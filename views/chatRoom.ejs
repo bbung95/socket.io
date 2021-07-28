@@ -235,7 +235,7 @@
       } else {
         output += "<li>";
         if (outuser != data.userId) {
-          output += "<div style='align-items: center'><img src='/imgFile/" + data.profile + "' style='width:40px; height:40px; border-radius: 30%; margin-right: 5px;' >"
+          output += `<div style='align-items: center'><img src='http://127.0.0.1:8080/images/uploadFiles/${data.profile}' style='width:40px; height:40px; border-radius: 30%; margin-right: 5px;' >`
           output += data.name + "</div>"
         }
         if (data.img != 0) {
