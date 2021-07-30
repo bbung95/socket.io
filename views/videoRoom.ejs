@@ -1,0 +1,163 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>무피채팅</title>
+    <script>
+        const ROOM_ID = "<%= roomId %>";
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- 부트스트랩 icon -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+
+    <script defer src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+
+    <style>
+        .main {
+            height: 100vh;
+            display: flex;
+        }
+
+        .main__left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main__videos {
+            flex-grow: 1;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .main__controls__block {
+            display: flex;
+        }
+
+        .main__controls__button {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 8px 10px;
+            min-width: 80px;
+            cursor: pointer;
+        }
+
+        .main__controls__button:hover {
+            background-color: #343434;
+            border-radius: 5px;
+        }
+
+        .main__controls__button i {
+            font-size: 24px;
+        }
+
+        .main__header {
+            padding-top: 5px;
+            color: #F5F5F5;
+            text-align: center;
+        }
+
+        .main__user_window {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .unmute,
+        .stop {
+            color: #CC3B33;
+        }
+
+        #video-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        video {
+            border-radius: 30px;
+            width: 600px;
+            height: auto;
+            object-fit: cover;
+            padding: 8px;
+            transform: rotateY(180deg);
+            -webkit-transform: rotateY(180deg);
+            /* Safari and Chrome */
+            -moz-transform: rotateY(180deg);
+            /* Firefox */
+        }
+
+        button {
+
+            border-radius: 20px;
+        }
+
+        i {
+            margin: 20px;
+            font-size: 30px;
+        }
+
+        .leave_meeting-btn{
+            margin: 0px;
+            border-radius: 50%;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="main">
+        <div class="main__left">
+
+            <div class="main__videos">
+                <div id="video-grid">
+
+                </div>
+            </div>
+
+            <div class="text-center" style="position: fixed; bottom: 50px; width: 100%;">
+
+                <button onclick="muteUnmute()" class="btn btn-primary">
+                    <i class="bi-mic-fill"></i>
+                </button>
+                <button onclick="stopVideo()" class="btn btn-primary">
+                    <i class="bi bi-camera-video-fill"></i>
+                </button>
+
+
+                <button class="btn btn-primary sharebtn" onclick="shareVideo()">
+                    <i class="bi bi-play-circle-fill"></i>
+                </button>
+
+
+                <button class="btn btn-danger leave_meeting-btn" onclick="leaveVideo()">
+                    <i class="bi bi-x-lg " ></i>
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js" defer></script>
+    <script src="script.js" defer></script>
+
+</body>
+
+</html>

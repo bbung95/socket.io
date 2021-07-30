@@ -107,7 +107,7 @@ app.get("/chat", (req, res) => {
 
 app.get("/:room", (req, res) => {
   // 1:1 화상채팅
-  res.render("room", { roomId: req.params.room });
+  res.render("videoRoom", { roomId: req.params.room });
 });
 
 app.get("/group/:room", (req, res) => {
@@ -126,20 +126,14 @@ io.on("connection", (socket) => {
 
   ///////// RTC////////////
   socket.on("join-room", (roomId, userId) => {
+    console.log(userId+" 룸 조인");
     socket.join(roomId);
     socket.to(roomId).emit("user-connected", userId);
-
-    
     
     socket.on("disconnect", () => {
       socket.to(roomId).emit("user-disconnected", userId);
     });
   });
-  
-  socket.on("screenShare", (roomId, screenStream)=>{
-    console.log(screenStream);
-    io.emit("screenShare");
-  })
 
   ////////// CHAT//////////
   socket.on("roomlist", (data) => {
