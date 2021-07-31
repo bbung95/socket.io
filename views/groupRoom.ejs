@@ -12,6 +12,7 @@
   <!-- jQuery fancyapps -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" />
 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
 
   <style>
     #main {
@@ -234,7 +235,7 @@
         if (data.img != 0) {
           output += `<span class="date" style="">${data.date}</span><a href="/imgFile/${data.img}"><img class='imgs' data-fancybox src='/imgFile/${data.img}' width='200'/></a>`;
         } else {
-          output += `<span class="date">${data.date}</span><div class='message' style='background: blue;'>`;
+          output += `<span class="date">${data.date}</span><div class='message' style='background: #87CEEB;'>`;
           output += "<pre>" + data.msg + "</pre></div>";
         }
       } else {
