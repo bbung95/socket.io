@@ -136,6 +136,10 @@
 
       font-size: 9px;
     }
+
+    button{
+      text-align: center;
+    }
   </style>
   <script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI="
     crossorigin="anonymous"></script>
@@ -144,6 +148,7 @@
 
 <body>
   <div id="topbar" class="fixed-top"><img src='http://127.0.0.1:8080/images/uploadFiles/<%= trgtProfile %>'
+                                              
       style='width:50px; height:50px; border-radius: 35%; margin: 5px 10px 5px 15px;' />
     <%= trgtName %>
   </div>
@@ -151,8 +156,8 @@
     <ul id="messages"></ul>
     <form id="form" action="">
       <div id="btnbar" align="right">
-        <button type="button" type="button" class="btn btn-light uploadbtn">+</button>
-        <button type="button" type="button" class="btn btn-light videobtn">call</button>
+        <button  type="button" class="btn btn-primary uploadbtn"><i class="bi bi-image-fill"></i></button>
+        <button  type="button" class="btn btn-primary videobtn"><i class="bi bi-camera-video"></i></button>
       </div>
 
       <input id="name" type="hidden" value="" /><textarea id="input"></textarea>
@@ -229,7 +234,7 @@
         if (data.img != 0) {
           output += `<span class="date" style="">${data.date}</span><a href="/imgFile/${data.img}"><img class='imgs' data-fancybox src='/imgFile/${data.img}' width='200'/></a>`;
         } else {
-          output += `<span class="date">${data.date}</span><div class='message'>`;
+          output += `<span class="date">${data.date}</span><div class='message' style='background: blue;'>`;
           output += "<pre>" + data.msg + "</pre></div>";
         }
       } else {

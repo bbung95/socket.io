@@ -112,7 +112,7 @@ app.get("/:room", (req, res) => {
 
 app.get("/group/:room", (req, res) => {
   // 그룹 화상채팅
-  res.render("room", { roomId: req.params.room });
+  res.render("videoRoom", { roomId: req.params.room });
 });
 
 app.post("/upload", upload.single("uploadFile"), (req, res) => {
