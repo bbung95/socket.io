@@ -36,21 +36,23 @@
 
     #input {
       margin: 10px;
-      /* background: gray; */
+      /* background: rgb(241, 246, 255); */
       height: 80px;
       resize: none;
-      width: 80%;
+      width: 100%;
+      outline: 0;
+      border-radius: 10px;
     }
 
     #topbar {
-      background: #edf3f8;
+      background: #f2f2f2;
       height: 60px;
     }
 
     #btnbar {
       height: 40px;
       background: #f2f2f2;
-      padding: 5px;
+
     }
 
     #btnbar>button {
@@ -69,15 +71,15 @@
     }
 
     #sendbtn {
-      position: fixed;
       width: 80px;
       height: 80px;
       bottom: 0;
       right: 0;
       border-radius: 10px;
-      background: #dbdbd9;
-      margin: 10px;
+      background: #9baec4;
+      margin: 10px 10px 10px 0px;
     }
+
 
     #sendbtn:hover {
       background: #cfcfca;
@@ -150,19 +152,23 @@
 
 <body>
   <div id="topbar" class="fixed-top"><img src='http://127.0.0.1:8080/images/uploadFiles/<%= trgtProfile %>'
-      style='width:50px; height:50px; border-radius: 35%; margin: 5px 10px 5px 15px;' />
+      style='width:50px; height:50px; border-radius: 50%; margin: 5px 10px 5px 15px; border: 2px solid #4299e1;' />
     <%= trgtName %>
   </div>
   <div id="main">
     <ul id="messages"></ul>
     <form id="form" action="">
-      <div id="btnbar" align="right">
-        <button  type="button" class="btn btn-primary uploadbtn"><i class="bi bi-image-fill"></i></button>
-        <button  type="button" class="btn btn-primary videobtn"><i class="bi bi-camera-video"></i></button>
+      <div id="btnbar" class="d-flex">
+        <div class="ms-auto">
+        <button type="button" class="btn btn-primary uploadbtn"><i class="bi bi-image-fill"></i></button>
+        <button type="button" class="btn btn-primary videobtn"><i class="bi bi-camera-video"></i></button>
+      </div>
       </div>
 
-      <input id="name" type="hidden" value="" /><textarea id="input"></textarea>
-      <span><button id="sendbtn" class="btn btn-light">전송</button></span>
+      <div class="d-flex">
+        <input id="name" type="hidden" value="" /><textarea id="input" class="shadow-sm"></textarea>
+        <span class="ms-auto"><button id="sendbtn" class="btn">전송</button></span>
+        </div>
     </form>
     <form id="upload" action="" method="post" enctype="multipart/form-data">
       <input type="file" id="uploadFile" name="uploadFile" style="display: none;" accept="image/*" />
@@ -241,7 +247,7 @@
       } else {
         output += "<li>";
         if (outuser != data.userId) {
-          output += `<div style='align-items: center'><img src='http://127.0.0.1:8080/images/uploadFiles/${data.profile}' style='width:40px; height:40px; border-radius: 30%; margin-right: 5px;' >`
+          output += `<div style='align-items: center'><img src='http://127.0.0.1:8080/images/uploadFiles/${data.profile}' style='width:40px; height:40px; border: 2px solid #4299e1; border-radius: 50%; margin-right: 5px;' >`
           output += data.name + "</div>"
         }
         if (data.img != 0) {

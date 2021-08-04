@@ -34,7 +34,6 @@ const upload = multer({
 const moment = require("moment");
 require("moment-timezone");
 moment.tz.setDefault("Asia/Seoul");
-var date = moment().format('a HH:mm');
 
 
 ////////////////// mongodb///////////////
@@ -270,6 +269,7 @@ server.listen(PORT, () => {
 ///////////////////////////////////////
 
 function chatList(msg) {
+  var date = moment().format('a HH:mm');
   var Chat = mongoose.model("chat_" + msg.roomNo, chat);
   console.log(msg.img);
   var newChat = new Chat({
@@ -293,6 +293,8 @@ function chatList(msg) {
         profile: msg.profile,
         date: date,
       });
+
+      console.log("현재시간 : "+date);
     }
   });
 }
